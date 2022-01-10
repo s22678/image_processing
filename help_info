@@ -1,0 +1,37 @@
+NAZWA
+        imageprocessor - process PBM and PGM images
+
+STRESZCZENIE
+        imageprocessor -h
+        imageprocessor [-n] [-b] [-dn] [-g] [-e] [-d]
+            [-i filename] [-o output] [-r width height] [-ib treshold] [-r angle]
+
+OPIS
+        imageprocessor przetwarza pliki graficzne grayscale i pliki graficzne binarne
+
+COMMANDS
+       -z      Like SPACE, but if N is specified, it becomes the new window size.
+
+       ESC-SPACE
+              Like SPACE, but scrolls a full screenful, even if it reaches end-of-file in the process.
+
+       ENTER or RETURN or ^N or e or ^E or j or ^J
+              Scroll forward N lines, default 1.  The entire N lines are displayed, even if N is more than the screen size.
+
+       d or ^D
+              Scroll forward N lines, default one half of the screen size.  If N is specified, it becomes the new default for subsequent d and u commands.
+
+       b or ^B or ESC-v
+              Scroll backward N lines, default one window (see option -z below).  If N is more than the screen size, only the final screenful is displayed.
+
+       w      Like ESC-v, but if N is specified, it becomes the new window size.
+
+       y or ^Y or ^P or k or ^K
+              Scroll backward N lines, default 1.  The entire N lines are displayed, even if N is more than the screen size.  Warning: some systems use ^Y as a special job control character.
+
+       u or ^U
+              Scroll backward N lines, default one half of the screen size.  If N is specified, it becomes the new default for subsequent d and u commands.
+
+       J      Like j, but continues to scroll beyond the end of the file.
+
+       K or Y Like k, but continues to scroll beyond the beginning of the file.

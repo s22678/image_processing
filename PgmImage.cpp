@@ -212,41 +212,55 @@ void PgmImage::ReduceNoise()
     pixels = temp;
 }
 
-void PgmImage::ApplyBlur()
+void PgmImage::ApplyBlur(const std::string& method)
 { 
     // tworzymy tymczasowy wektor na przetworzone piksele
     std::vector<short>temp(width * height);
-  
-    // maska dla filtra rozmycia
-    float mask[3][3] = {
-                {1,1,1},
-                {1,1,1},
-                {1,1,1}
-    };
+
+    // tworzymy maske
+    const int MASK_HEIGHT_SIZE = 3;
+    const int MASK_WIDTH_SIZE = 3;
+
+    std::vector<float>mask(MASK_WIDTH_SIZE * MASK_HEIGHT_SIZE);
+
+    // suma wag, przez którą dzielimy każdy piksel
+    float coefficient = 0.0;
+
+    // wartości macierzy maski dobrane w zależności od metody rozmycia
+    if (method == "average")
+    {
+        mask = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+        coefficient = 9.0;
+    }
+
+    if (method == "gauss")
+    {
+        mask = {1.0, 2.0, 1.0, 2.0, 4.0, 2.0, 1.0, 2.0, 1.0};
+        coefficient = 16.0;
+    }
      
     for (uint32_t y = 1; y < height - 1; y++)
     {
         for (uint32_t x = 1; x < width - 1; x++)
         { 
-            float color = 0;
+            float pixel_value = 0;
              
-            for (uint32_t a = 0; a < 3; a++)
+            for (uint32_t a = 0; a < MASK_HEIGHT_SIZE; a++)
             {
-                for (uint32_t b = 0; b < 3; b++)
+                for (uint32_t b = 0; b < MASK_WIDTH_SIZE; b++)
                 { 
                     int xx = x + b - 1;
                     int yy = y + a - 1;
-                     
-                    color += pixels[yy * width + xx] * mask[a][b];
+
+                    pixel_value += pixels[yy * width + xx] * mask[a * MASK_WIDTH_SIZE + b];
                 }
             }
 
-            // dzielimy otrzymany kolor przez 9  - ilosc elementow 
-            // znajdujacych sie w filtrze, czyli usredniamy wynik
-            color /= 9.0;
+            // dzielimy otrzymany kolor przez współczynnik (sume wartości macierzy maski) czyli usredniamy wynik
+            pixel_value /= coefficient;
              
             // umieszczamy nowy 'rozmyty' piksel w tablicy
-            temp[y * width + x] = static_cast<short>(color);
+            temp[y * width + x] = static_cast<short>(pixel_value);
         }
     }
 

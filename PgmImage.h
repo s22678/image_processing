@@ -20,7 +20,7 @@ public:
     void ResizeImage(int new_width, int new_height);
     void RotateImage(float ang);
     void BinaryImage(const short& treshold);
-    void ApplyBlur();
+    void ApplyBlur(const std::string& method);
     void ReduceNoise();
     void NegativeImage();
     void GradientImage();
@@ -31,4 +31,7 @@ public:
 
     template<typename T>
     void BubbleSort(std::vector<T>& vec);
+
+    template <typename T, size_t rows, size_t cols>
+    void copy_2d_array_template(T (&receiver_array)[rows][cols], const T (&sender_array)[rows][cols]);
 };

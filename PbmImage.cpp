@@ -27,20 +27,6 @@ PbmImage::PbmImage(const std::string& filename)
     input_stream.close(); 
 }
 
-void PbmImage::PrintImage()
-{
-    std::cout << "P1\n";
-    std::cout << width;
-    std::cout << " ";
-    std::cout << height << "\n";
-
-    for (unsigned int i = 0; i < width*height; ++i)
-    {
-        std::cout << pixels[i] << " ";
-        if (i % width) std::cout << "\n";
-    }
-}
-
 void PbmImage::SaveImage(const std::string& filename)
 {
     std::ofstream input_stream(filename.c_str(), std::ios::out | std::ios::binary);
@@ -136,7 +122,6 @@ void PbmImage::ResizeImage(int new_width, int new_height)
 void PbmImage::ErodeImage()
 {
     std::vector<uint8_t> temp(width * height);
-    std::vector<uint8_t> mask = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 
     for (int y = 0; y < height; y++)
     {

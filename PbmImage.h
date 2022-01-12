@@ -12,8 +12,6 @@ private:
     int height;
     int resolution;
     std::vector<uint8_t> pixels;
-
-public:
     enum image_part
     {
         LEFT_TOP,
@@ -27,20 +25,23 @@ public:
         CENTER
     };
 
+public:
+
+    // metody zewnętrzne
     PbmImage(const std::string& filename);
     void ReadHeader(std::ifstream& input);
     void ReadPixels(std::ifstream& input);
     void ResizeImage(int new_width, int new_height);
     void RotateImage(float ang);
     void ErodeImage();
-    image_part CheckBorderType(const int& y, const int& x);
     void DilateImage();
     void NegativeImage();
-    void PrintImage();
     void SaveImage(const std::string& filename);
+
+    // metody wewnętrzne
     int len_trim(std::string s);
     void extract_word(std::string s, std::string& s1, std::string& s2);
-
+    image_part CheckBorderType(const int& y, const int& x);
     template<typename T>
     void BubbleSort(std::vector<T>& vec);
 };

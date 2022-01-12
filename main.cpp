@@ -72,7 +72,8 @@ void GenerateImage(std::vector<string>& instructions)
         }
         else if (command == ARG_BOOL_GRADIENT_IMAGE)
         {
-            pgm->GradientImage();
+            std::string method = instructions[i++];
+            pgm->GradientImage(method);
         }
         else if (command == ARG_BOOL_REDUCE_NOISE)
         { 

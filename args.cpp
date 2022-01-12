@@ -68,7 +68,9 @@ void Args::parse(int argc, char* argv[])
 		}
 		else if (ARG_BOOL_GRADIENT_IMAGE.compare(argv[i]) == 0)
 		{
+			std::string method = to_lower_case(argv[++i]);
 			instructions.push_back(ARG_BOOL_GRADIENT_IMAGE);
+			instructions.push_back(method);
 		}
 		else if (ARG_BOOL_REDUCE_NOISE.compare(argv[i]) == 0)
 		{
@@ -169,6 +171,18 @@ bool Args::validate() const
 			if (method != "average" && method != "gauss")
 			{
 				cerr << "Zla metoda rozmycia. Wybierz 'gauss' albo 'average' " << " nie mozna zastosowac flagi " << ARG_BOOL_APPLY_BLUR << endl;
+				status = false;
+			}
+		}
+		else if (command == ARG_BOOL_GRADIENT_IMAGE)
+		{
+			std::string method = instructions[i++];
+
+			std::cout << "metoda: " << method << std::endl;
+
+			if (method != "1" && method != "2" && method != "3")
+			{
+				cerr << "Zly filtr gradientu. Wybierz '1' dla metody Sobela, '2' dla Prewitta, albo '3' dla Robertsa " << " nie mozna zastosowac flagi " << ARG_BOOL_APPLY_BLUR << endl;
 				status = false;
 			}
 		}

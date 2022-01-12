@@ -27,21 +27,6 @@ PgmImage::PgmImage(const std::string& filename)
     input_stream.close(); 
 }
 
-void PgmImage::PrintImage()
-{
-    std::cout << "P2\n";
-    std::cout << width;
-    std::cout << " ";
-    std::cout << height << "\n";
-    std::cout << grey_scale << "\n";
-
-    for (unsigned int i = 0; i < width*height; ++i)
-    {
-        std::cout << pixels[i] << " ";
-        if (i % width) std::cout << "\n";
-    }
-}
-
 void PgmImage::SaveImage(const std::string& filename)
 {
     std::ofstream input_stream(filename.c_str(), std::ios::out | std::ios::binary);
@@ -393,42 +378,66 @@ void PgmImage::extract_word(std::string s, std::string& s1, std::string& s2)
 
     return;
 }
-void PgmImage::GradientImage()
+void PgmImage::GradientImage(const std::string& method)
 {
-    float G1[3][3] = {
-            {1,0,-1},
-            {2,0,-2},
-            {1,0,-1}
-    };
 
-    float G2[3][3] = {
-            {1,2,1},
-            {0,0,0},
-            {-1,-2,-1}
-    };
+    // Tworzona jest tablica - maska
+    std::vector<float> gx_mask;
+    std::vector<float> gy_mask;
+
+    // Rozmiary tablicy - maski
+    int MASK_HEIGHT = 0;
+    int MASK_WIDTH = 0;
+
+    // Sobel
+    if (method == "1")
+    {
+        MASK_HEIGHT = 3;
+        MASK_WIDTH = 3;
+
+        gx_mask = {1, 0, -1, 2, 0, -2, 1, 0, -1};
+        gy_mask = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+    }
+
+    // Prewitt
+    if (method == "2")
+    {
+        MASK_HEIGHT = 3;
+        MASK_WIDTH = 3;
+
+        gx_mask = {1, 0, -1, 1, 0, -1, 1, 0, -1};
+        gy_mask = {1, 1, 1, 0, 0, 0, -1, -1, -1};
+    }
+
+    // Roberts
+    if (method == "3")
+    {
+        MASK_HEIGHT = 2;
+        MASK_WIDTH = 2;
+
+        gx_mask = {1, 0, 0, -1};
+        gy_mask = {0, 1, 11, 0};
+    }
 
     std::vector<short>temp(width * height);
-       
 
     for (uint32_t y = 1; y < height - 1; y++)
     {
         for (uint32_t x = 1; x < width - 1; x++)
         {
-
             float output_color = 0;
             float color1 = 0;
             float color2 = 0;
 
-            for (uint32_t i = 0; i < 3; i++)
+            for (uint32_t i = 0; i < MASK_HEIGHT; i++)
             {
-                for (uint32_t j = 0; j < 3; j++)
+                for (uint32_t j = 0; j < MASK_WIDTH; j++)
                 {
                     int xx = x + i - 1;
                     int yy = y + j - 1;
                      
-                    color1 += pixels[yy * width + xx] * G1[i][j];
-                    color2 += pixels[yy * width + xx] * G2[i][j];
-
+                    color1 += pixels[yy * width + xx] * gx_mask[i * MASK_WIDTH + j];
+                    color2 += pixels[yy * width + xx] * gy_mask[i * MASK_WIDTH + j];
                 }
             }
             output_color = sqrt(color1 * color1 + color2 * color2);
@@ -440,7 +449,6 @@ void PgmImage::GradientImage()
                 output_color  = 0;
              
             temp[y * width + x] = static_cast<short>(output_color);
-
         }
     }
 

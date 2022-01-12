@@ -1,11 +1,13 @@
 #pragma once 
 
+#include "Image.h"
+
 #include <string>
 #include <vector>
 #include <fstream>
 #include <cstdlib>
 
-class PgmImage
+class PgmImage : public Image
 {
 private:
     int width;
@@ -23,15 +25,13 @@ public:
     void ApplyBlur(const std::string& method);
     void ReduceNoise();
     void NegativeImage();
-    void GradientImage();
-    void PrintImage();
+    void GradientImage(const std::string& method);
     void SaveImage(const std::string& filename);
+
+    // metody wewnętrzne
     int len_trim(std::string s);
     void extract_word(std::string s, std::string& s1, std::string& s2);
 
     template<typename T>
     void BubbleSort(std::vector<T>& vec);
-
-    template <typename T, size_t rows, size_t cols>
-    void copy_2d_array_template(T (&receiver_array)[rows][cols], const T (&sender_array)[rows][cols]);
 };

@@ -337,7 +337,7 @@ void PgmImage::ReadHeader(std::ifstream& input)
             step = 3;
         }
 
-        // pobieramy kolejny parametr - sklae szarosci z naglowka
+        // pobieramy kolejny parametr - skale szarosci z naglowka
         if (step == 3)
         {
             extract_word(line, word, rest);

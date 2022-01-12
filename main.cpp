@@ -79,8 +79,9 @@ void GenerateImage(std::vector<string>& instructions)
             pgm->ReduceNoise();
         }
         else if (command == ARG_BOOL_APPLY_BLUR)
-        { 
-            pgm->ApplyBlur();
+        {
+            std::string method = instructions[i++];
+            pgm->ApplyBlur(method);
         }
         else if (command == ARG_STR_OUTPUT)
         {  

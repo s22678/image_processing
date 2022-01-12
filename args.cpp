@@ -61,10 +61,10 @@ void Args::parse(int argc, char* argv[])
 		}
 		else if (ARG_STR_OUTPUT.compare(argv[i]) == 0)
 		{ 
-			std::string output = to_lower_case(argv[++i]);
+			std::string method = to_lower_case(argv[++i]);
 
 			instructions.push_back(ARG_STR_OUTPUT);
-			instructions.push_back(output); 
+			instructions.push_back(method);
 		}
 		else if (ARG_BOOL_GRADIENT_IMAGE.compare(argv[i]) == 0)
 		{
@@ -76,8 +76,12 @@ void Args::parse(int argc, char* argv[])
 		}
 		else if (ARG_BOOL_APPLY_BLUR.compare(argv[i]) == 0)
 		{
+			std::string method = to_lower_case(argv[++i]);
+
 			instructions.push_back(ARG_BOOL_APPLY_BLUR);
-		} else if (ARG_BOOL_DISPLAY_HELP.compare(argv[i]) == 0)
+			instructions.push_back(method);
+		}
+		else if (ARG_BOOL_DISPLAY_HELP.compare(argv[i]) == 0)
 		{
 			instructions.push_back(ARG_BOOL_DISPLAY_HELP);
 		}
@@ -97,8 +101,20 @@ bool Args::validate() const
 	while (i < instructions.size())
 	{
 		std::string command = instructions[i++];
-
-		if (command == ARG_INT_RESOLUTION)
+		if (command == ARG_BOOL_DISPLAY_HELP)
+		{
+			if (instructions.size() > 1)
+			{
+				cerr << "flaga -h nie może być łączona z innymi flagami " << endl;
+				std::cout << "Wydrukuj pomoc" << std::endl;
+				return false;
+			}
+			else
+			{
+				std::cout << "Wydrukuj pomoc" << std::endl;
+			}
+		}
+		else if (command == ARG_INT_RESOLUTION)
 		{
 			int x = stoi(instructions[i++]);
 			int y = stoi(instructions[i++]);
@@ -113,7 +129,7 @@ bool Args::validate() const
 		{
 			fs::path input = fs::path(instructions[i++]);
 
-			if (input.extension() != ".pgm") // Heed the dot.
+			if (input.extension() != ".pgm" && input.extension() != ".pbm") // Heed the dot.
 			{
 				std::cout << input.filename() << " is an invalid input type." << endl; // Output: e.g. "myFile.cfg is an invalid type"
 				status = false;
@@ -128,7 +144,7 @@ bool Args::validate() const
 		{
 			fs::path output = fs::path(instructions[i++]);
 
-			if (output.extension() != ".pgm") // Heed the dot.
+			if (output.extension() != ".pgm" && output.extension() != ".pbm") // Heed the dot.
 			{
 				std::cout << output.filename() << " is an invalid output type." << endl; // Output: e.g. "myFile.cfg is an invalid type"
 				status = false;
@@ -144,6 +160,18 @@ bool Args::validate() const
 				status = false;
 			}
 		}
+		else if (command == ARG_BOOL_APPLY_BLUR)
+		{
+			std::string method = instructions[i++];
+
+			std::cout << "metoda: " << method << std::endl;
+
+			if (method != "average" && method != "gauss")
+			{
+				cerr << "Zla metoda rozmycia. Wybierz 'gauss' albo 'average' " << " nie mozna zastosowac flagi " << ARG_BOOL_APPLY_BLUR << endl;
+				status = false;
+			}
+		}
 		else if (command == ARG_BOOL_IMAGE_DILATION)
 		{
 			cerr << "Obraz wejsciowy nie jest obrazem binarnym " << " nie mozna zastosowac flagi " << ARG_BOOL_IMAGE_DILATION << endl;
@@ -153,10 +181,6 @@ bool Args::validate() const
 		{
 			cerr << "Obraz wejsciowy nie jest obrazem binarnym " << " nie mozna zastosowac flagi " << ARG_BOOL_IMAGE_EROSION << endl;
 			status = false;
-		}
-		else if (command == ARG_BOOL_DISPLAY_HELP)
-		{
-			std::cout <<"wydrukuj pomoc" << std::endl;
 		}
 	}
 	return status;

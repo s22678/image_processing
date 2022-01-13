@@ -2,3 +2,4 @@ a.out
 .vscode/*
 input.pgm
 input1.pbm
+libs.h

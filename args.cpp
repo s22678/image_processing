@@ -83,7 +83,7 @@ void Args::parse(int argc, char* argv[])
 			instructions.push_back(ARG_BOOL_APPLY_BLUR);
 			instructions.push_back(method);
 		}
-		else if (ARG_BOOL_DISPLAY_HELP.compare(argv[i]) == 0)
+		else if (ARG_BOOL_DISPLAY_HELP.compare(argv[i]) == 0 || argc == 1)
 		{
 			instructions.push_back(ARG_BOOL_DISPLAY_HELP);
 		}
@@ -92,6 +92,8 @@ void Args::parse(int argc, char* argv[])
 			std::cout << "Nierozpoznano polecenia: " << argv[i] << std::endl;
 			exit(0);
 		}
+
+		for(const auto& it : instructions) std::cout << "it: " << it << '\n';
 	}
 }
 
@@ -185,16 +187,6 @@ bool Args::validate() const
 				cerr << "Zly filtr gradientu. Wybierz '1' dla metody Sobela, '2' dla Prewitta, albo '3' dla Robertsa " << " nie mozna zastosowac flagi " << ARG_BOOL_APPLY_BLUR << endl;
 				status = false;
 			}
-		}
-		else if (command == ARG_BOOL_IMAGE_DILATION)
-		{
-			cerr << "Obraz wejsciowy nie jest obrazem binarnym " << " nie mozna zastosowac flagi " << ARG_BOOL_IMAGE_DILATION << endl;
-			status = false;
-		}
-		else if (command == ARG_BOOL_IMAGE_EROSION)
-		{
-			cerr << "Obraz wejsciowy nie jest obrazem binarnym " << " nie mozna zastosowac flagi " << ARG_BOOL_IMAGE_EROSION << endl;
-			status = false;
 		}
 	}
 	return status;

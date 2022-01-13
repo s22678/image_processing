@@ -1,53 +1,62 @@
-#include "PgmImage.h"
 #include <string>
 #include <cstring>
 #include <iostream>
 #include <vector>
-#include "args.h" 
-  
-bool is_file_supported(const std::string& filename, std::string& filetype)
-{
-    const char* pch = strrchr(filename.c_str(), '.');
-    filetype = filename.substr(pch - filename.c_str() + 1);
-    if (filetype == "pgm")
-    {
-        return true;
-    }
+#include <functional>
+#include <stdexcept>
 
-    return false;
-}
-
-template <typename T>
-T* load_image(const std::string& filename)
-{
-    std::string filetype = "";
-    if (is_file_supported(filename, filetype))
-    {
-        if (filetype == "pgm")
-        {
-            return new PgmImage(filename);
-        }
-    }
-    return nullptr;
-}
+#include "args.h"
+#include "PgmImage.h"
+#include "PbmImage.h"
+#include "Image.h"
 
 // funkcja odpowiedzialna za przetworzenie wszystkich instrukcji
 // znajdujacych sie w wektorze
 void GenerateImage(std::vector<string>& instructions)
-{ 
-    PgmImage* pgm = NULL; 
-     
+{
+    Image* pgm = nullptr;
+
+    for (int i = 0; i < instructions.size(); ++i)
+    {   std::cout << "flaga: " << instructions[i] << "\ti: " << i << "\trozmiar: " << instructions.size() << '\n';
+        if (instructions[i] == "-i" && i < instructions.size())
+        {
+            std::cout << "test" << instructions[i+1] << '\n';
+            std::string filename = instructions[i+1];
+            std::transform(filename.begin(), filename.end(), filename.begin(), [](unsigned char c){ return std::tolower(c); });
+            const char* pch = strrchr(filename.c_str(), '.');
+            std::string filetype = filename.substr(pch - filename.c_str() + 1);
+
+            if (filetype == "pgm")
+            {
+                pgm = new PgmImage(filename);
+            }
+            else if (filetype == "pbm")
+            {
+                pgm = new PbmImage(filename);
+            }
+        }
+        // else
+        // {
+        //     throw std::invalid_argument("Nie znaleziono sciezki do pliku");
+        // }
+    }
+
+    if (pgm == nullptr)
+    {
+        std::cout << "cos poszlo nie tak" << '\n';
+        exit(1);
+    }
     int i = 0;
 
     while (i < instructions.size())
     {
         std::string command = instructions[i++];
 
-        if (command == ARG_STR_INPUT)
-        {
-            pgm = new PgmImage(instructions[i++]);
-        }
-        else if (command == ARG_INT_RESOLUTION)
+        // if (command == ARG_STR_INPUT)
+        // {
+        //     pgm = new PgmImage(instructions[i++]);
+        // }
+        if (command == ARG_INT_RESOLUTION)
         {
             int x = stoi(instructions[i++]);
             int y = stoi(instructions[i++]);
@@ -58,7 +67,7 @@ void GenerateImage(std::vector<string>& instructions)
         {
             int threshold = stoi(instructions[i++]);
 
-            pgm->BinaryImage(threshold); 
+             static_cast<PgmImage*>(pgm)->BinaryImage(threshold); 
         }
         else if (command == ARG_BOOL_NEGATIVE)
         {
@@ -73,21 +82,29 @@ void GenerateImage(std::vector<string>& instructions)
         else if (command == ARG_BOOL_GRADIENT_IMAGE)
         {
             std::string method = instructions[i++];
-            pgm->GradientImage(method);
+            static_cast<PgmImage*>(pgm)->GradientImage(method);
         }
         else if (command == ARG_BOOL_REDUCE_NOISE)
         { 
-            pgm->ReduceNoise();
+             static_cast<PgmImage*>(pgm)->ReduceNoise();
         }
         else if (command == ARG_BOOL_APPLY_BLUR)
         {
             std::string method = instructions[i++];
-            pgm->ApplyBlur(method);
+             static_cast<PgmImage*>(pgm)->ApplyBlur(method);
         }
         else if (command == ARG_STR_OUTPUT)
         {  
             pgm->SaveImage(instructions[i++]);
         }
+		else if (command == ARG_BOOL_IMAGE_DILATION)
+		{
+			 static_cast<PbmImage*>(pgm)->DilateImage();
+		}
+		else if (command == ARG_BOOL_IMAGE_EROSION)
+		{
+			 static_cast<PbmImage*>(pgm)->ErodeImage();
+		}
     }
 }
 
@@ -101,7 +118,7 @@ int main(int argc, char* argv[])
     Args args(instructions);
     args.parse(argc, argv); // parsujemy tekst podany w konsoli na pojedyncze polecenia i dane
                             // informacje te laduja w wektorze instructions
-
+    std::cout << "rozmiar instrukcji: " << instructions.size() << '\n';
     // jesli uzytkownik wprowadzil poprawne polecenie, ponizszy kod zostanie wykonany
     if (args.validate())
     {

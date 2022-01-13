@@ -287,8 +287,7 @@ void PgmImage::ReadHeader(std::ifstream& input)
             line = rest;
 
             // sprawdzamy naglowek pliku, powinien skalda sie z dwoch znakow - P2
-            if ((word[0] != 'P' && word[0] != 'p') ||
-                word[1] != '2')
+            if ((word[0] != 'P' && word[0] != 'p') || word[1] != '2')
             {
                 std::cout << "error" << std::endl;
                 exit(1);

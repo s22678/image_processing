@@ -37,7 +37,7 @@ void PbmImage::SaveImage(const std::string& filename)
         input_stream << " ";
         input_stream << height << "\n";
 
-        short aux;
+        uint8_t aux;
         for (unsigned int j = 0; j < height; j++)
         {
             for (unsigned int i = 0; i < width; ++i)
@@ -299,7 +299,7 @@ void PbmImage::extract_word(std::string s, std::string& s1, std::string& s2)
 
 void PbmImage::NegativeImage()
 {
-    std::for_each(pixels.begin(), pixels.end(), [&](short& x) { x = 1 - x; return x; });
+    std::for_each(pixels.begin(), pixels.end(), [&](uint8_t& x) { x = 1 - x; return x; });
 }
 
 int PbmImage::len_trim(std::string s)
@@ -325,7 +325,7 @@ void PbmImage::ReadPixels(std::ifstream& input)
     {
         for (int i = 0; i < width; i++)
         {
-            short px;
+            uint8_t px;
             input >> px;
             pixels[idx++] = px; 
         }

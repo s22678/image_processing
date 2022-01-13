@@ -1,11 +1,12 @@
 #pragma once 
 
+#include "Image.h"
 #include <string>
 #include <vector>
 #include <fstream>
 #include <cstdlib>
 
-class PbmImage
+class PbmImage : public Image
 {
 private:
     int width;

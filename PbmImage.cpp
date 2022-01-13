@@ -9,13 +9,12 @@
 
 PbmImage::PbmImage(const std::string& filename)
 {
-    std::ifstream input_stream(filename);
-
+    std::ifstream input_stream(filename, std::ios::in);
     if (input_stream.is_open()) // gdy plik zostal otwarty wykonujemy ponizsze operacje
     {
         ReadHeader(input_stream); // czytam naglowek pliku
         
-        pixels = std::vector<uint8_t>(width * height); // rezerwujemy odpowiednia ilosc pamieci w wektorze
+        pixels = std::vector<uint16_t>(width * height); // rezerwujemy odpowiednia ilosc pamieci w wektorze
 
         ReadPixels(input_stream); // wczytujemy piksele z obrazu
     }
@@ -29,36 +28,38 @@ PbmImage::PbmImage(const std::string& filename)
 
 void PbmImage::SaveImage(const std::string& filename)
 {
-    std::ofstream input_stream(filename.c_str(), std::ios::out | std::ios::binary);
-    if (input_stream.is_open())
-    {
-        input_stream << "P1\n";
-        input_stream << width;
-        input_stream << " ";
-        input_stream << height << "\n";
 
-        uint8_t aux;
+    std::ofstream output_stream(filename.c_str(), std::ios::out);
+
+    if (output_stream.is_open())
+    {
+        output_stream << "P1\n";
+        output_stream << width;
+        output_stream << " ";
+        output_stream << height << "\n";
+
+        uint16_t aux;
         for (unsigned int j = 0; j < height; j++)
         {
             for (unsigned int i = 0; i < width; ++i)
             {
                 aux = pixels[j*width + i];
-                input_stream << aux << " ";
+                output_stream << aux << " ";
             }
-            input_stream << "\n";
+            output_stream << "\n";
         }
     }
     else
     {
         std::cout << "Error. Unable to open " << filename << std::endl;
     }
-    input_stream.close();
+    output_stream.close();
 }
 
 void PbmImage::RotateImage(float angle)
 {
     // tworzymy tymczasowy wektor ktory bedzie przechowywac przetworzony obraz
-    std::vector<uint8_t>temp(width * height); 
+    std::vector<uint16_t>temp(width * height); 
     
     // konwertujemy stopnie na radiany,
     // funkcja takie jak sin czy cos ze standardowej biblioteki
@@ -90,7 +91,7 @@ void PbmImage::RotateImage(float angle)
 void PbmImage::ResizeImage(int new_width, int new_height)
 {
     // tworzymy tymczasowy wektor o rozmiarze nowego obrazu
-    std::vector<uint8_t>temp(new_width * new_height);
+    std::vector<uint16_t>temp(new_width * new_height);
 
     // szukamy wspolczynnika skalowania dla osi poziomej i pionowej
     float x_scale = width / (float)new_width;
@@ -119,31 +120,46 @@ void PbmImage::ResizeImage(int new_width, int new_height)
     pixels = temp;
 }
 
+// template<class T>
+// uint16_t PbmImage::compare_pixels(char lv, char rv, T func)
+// {
+
+// }
+
 void PbmImage::ErodeImage()
 {
-    std::vector<uint8_t> temp(width * height);
+    std::vector<uint16_t> temp(width * height);
 
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
         {
-            if (CheckBorderType(y, x) == LEFT_TOP) temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y + 1) * width + x]) && (pixels[y * width + x + 1] & 1));
+            if (CheckBorderType(y, x) == LEFT_TOP)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y + 1) * width + x]) && (pixels[y * width + x + 1] & 1));
 
-            if (CheckBorderType(y, x) == RIGHT_TOP) temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y + 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1));
+            if (CheckBorderType(y, x) == RIGHT_TOP)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y + 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1));
 
-            if (CheckBorderType(y, x) == LEFT_BOTTOM) temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x + 1] & 1));
+            if (CheckBorderType(y, x) == LEFT_BOTTOM)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x + 1] & 1));
 
-            if (CheckBorderType(y, x) == RIGHT_BOTTOM) temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1));
+            if (CheckBorderType(y, x) == RIGHT_BOTTOM)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) && (pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1));
 
-            if (CheckBorderType(y, x) == LEFT_EDGE) temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x]) && (pixels[y * width + x + 1] & 1) && (pixels[(y + 1) * width + x] & 1));
+            if (CheckBorderType(y, x) == LEFT_EDGE)
+                temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x]) && (pixels[y * width + x + 1] & 1) && (pixels[(y + 1) * width + x] & 1));
 
-            if (CheckBorderType(y, x) == TOP_EDGE) temp[y * width + x] = ((pixels[y * width + x - 1] & 1) && (pixels[y * width + x] & 1) && (pixels[y * width + x + 1] & 1) && (pixels[(y + 1) * width + x] & 1));
+            if (CheckBorderType(y, x) == TOP_EDGE)
+                temp[y * width + x] = ((pixels[y * width + x - 1] & 1) && (pixels[y * width + x] & 1) && (pixels[y * width + x + 1] & 1) && (pixels[(y + 1) * width + x] & 1));
 
-            if (CheckBorderType(y, x) == RIGHT_EDGE) temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x] & 1) && (pixels[(y + 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1));
+            if (CheckBorderType(y, x) == RIGHT_EDGE)
+                temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x] & 1) && (pixels[(y + 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1));
 
-            if (CheckBorderType(y, x) == BOTTOM_EDGE) temp[y * width + x] = ((pixels[y * width + x - 1] & 1) && (pixels[y * width + x] & 1) && (pixels[y * width + x + 1] & 1) && (pixels[(y - 1) * width + x] & 1));
+            if (CheckBorderType(y, x) == BOTTOM_EDGE)
+                temp[y * width + x] = ((pixels[y * width + x - 1] & 1) && (pixels[y * width + x] & 1) && (pixels[y * width + x + 1] & 1) && (pixels[(y - 1) * width + x] & 1));
 
-            if (CheckBorderType(y, x) == CENTER) temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1) && (pixels[y * width + x] & 1) && (pixels[y * width + x + 1] & 1) && (pixels[(y + 1) * width + x] & 1));
+            if (CheckBorderType(y, x) == CENTER)
+                temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) && (pixels[y * width + x - 1] & 1) && (pixels[y * width + x] & 1) && (pixels[y * width + x + 1] & 1) && (pixels[(y + 1) * width + x] & 1));
         }
     }
 
@@ -159,10 +175,10 @@ PbmImage::image_part PbmImage::CheckBorderType(const int& y, const int& x)
     if (y == height - 1 && x == 0) return LEFT_BOTTOM;
 
     // prawy gorny
-    if (y == 0 && x == width - 1) return LEFT_TOP;
+    if (y == 0 && x == width - 1) return RIGHT_TOP;
 
     // prawy dolny
-    if (y == height - 1 && x == width - 1) return LEFT_BOTTOM;
+    if (y == height - 1 && x == width - 1) return RIGHT_BOTTOM;
     
     // lewy brzeg
     if (y != 0 && y != (height - 1) && x == 0) return LEFT_EDGE;
@@ -181,7 +197,42 @@ PbmImage::image_part PbmImage::CheckBorderType(const int& y, const int& x)
 
 void PbmImage::DilateImage()
 {
+    std::vector<uint16_t> temp(width * height);
 
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            if (CheckBorderType(y, x) == LEFT_TOP)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y + 1) * width + x]) || (pixels[y * width + x + 1] & 1));
+
+            if (CheckBorderType(y, x) == RIGHT_TOP)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y + 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1));
+
+            if (CheckBorderType(y, x) == LEFT_BOTTOM)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x + 1] & 1));
+
+            if (CheckBorderType(y, x) == RIGHT_BOTTOM)
+                temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1));
+
+            if (CheckBorderType(y, x) == LEFT_EDGE)
+                temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x]) || (pixels[y * width + x + 1] & 1) || (pixels[(y + 1) * width + x] & 1));
+
+            if (CheckBorderType(y, x) == TOP_EDGE)
+                temp[y * width + x] = ((pixels[y * width + x - 1] & 1) || (pixels[y * width + x] & 1) || (pixels[y * width + x + 1] & 1) || (pixels[(y + 1) * width + x] & 1));
+
+            if (CheckBorderType(y, x) == RIGHT_EDGE)
+                temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x] & 1) || (pixels[(y + 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1));
+
+            if (CheckBorderType(y, x) == BOTTOM_EDGE)
+                temp[y * width + x] = ((pixels[y * width + x - 1] & 1) || (pixels[y * width + x] & 1) || (pixels[y * width + x + 1] & 1) || (pixels[(y - 1) * width + x] & 1));
+    
+            if (CheckBorderType(y, x) == CENTER)
+                temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1) || (pixels[y * width + x] & 1) || (pixels[y * width + x + 1] & 1) || (pixels[(y + 1) * width + x] & 1));
+        }
+    }
+
+    pixels = temp;
 }
 
 void PbmImage::ReadHeader(std::ifstream& input)
@@ -217,13 +268,14 @@ void PbmImage::ReadHeader(std::ifstream& input)
             
             line = rest;
 
-            // sprawdzamy naglowek pliku, powinien skalda sie z dwoch znakow - P2
-            if ((word[0] != 'P' && word[0] != 'p') ||
-                word[1] != '2')
+            // sprawdzamy naglowek pliku, powinien skalda sie z dwoch znakow - P1 albo P4
+            if ((word[0] != 'P' && word[0] != 'p') || (word[1] != '1' && word[1] != '4'))
             {
                 std::cout << "error" << std::endl;
                 exit(1);
             }
+            if(word[1] == 2) it = P1;
+            if(word[1] == 4) it = P4;
             step = 1;
         }
 
@@ -299,7 +351,7 @@ void PbmImage::extract_word(std::string s, std::string& s1, std::string& s2)
 
 void PbmImage::NegativeImage()
 {
-    std::for_each(pixels.begin(), pixels.end(), [&](uint8_t& x) { x = 1 - x; return x; });
+    std::for_each(pixels.begin(), pixels.end(), [&](uint16_t& x) { x = 1 - x; return x; });
 }
 
 int PbmImage::len_trim(std::string s)
@@ -325,7 +377,7 @@ void PbmImage::ReadPixels(std::ifstream& input)
     {
         for (int i = 0; i < width; i++)
         {
-            uint8_t px;
+            uint16_t px;
             input >> px;
             pixels[idx++] = px; 
         }

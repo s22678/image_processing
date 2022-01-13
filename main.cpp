@@ -17,10 +17,9 @@ void GenerateImage(std::vector<string>& instructions)
     Image* pgm = nullptr;
 
     for (int i = 0; i < instructions.size(); ++i)
-    {   std::cout << "flaga: " << instructions[i] << "\ti: " << i << "\trozmiar: " << instructions.size() << '\n';
+    {
         if (instructions[i] == "-i" && i < instructions.size())
         {
-            std::cout << "test" << instructions[i+1] << '\n';
             std::string filename = instructions[i+1];
             std::transform(filename.begin(), filename.end(), filename.begin(), [](unsigned char c){ return std::tolower(c); });
             const char* pch = strrchr(filename.c_str(), '.');
@@ -118,7 +117,7 @@ int main(int argc, char* argv[])
     Args args(instructions);
     args.parse(argc, argv); // parsujemy tekst podany w konsoli na pojedyncze polecenia i dane
                             // informacje te laduja w wektorze instructions
-    std::cout << "rozmiar instrukcji: " << instructions.size() << '\n';
+
     // jesli uzytkownik wprowadzil poprawne polecenie, ponizszy kod zostanie wykonany
     if (args.validate())
     {

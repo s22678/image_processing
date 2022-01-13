@@ -12,7 +12,7 @@ private:
     int width;
     int height;
     int resolution;
-    std::vector<uint8_t> pixels;
+    std::vector<uint16_t> pixels;
     enum image_part
     {
         LEFT_TOP,
@@ -25,6 +25,12 @@ private:
         BOTTOM_EDGE,
         CENTER
     };
+
+    enum image_type
+    {
+        P1,
+        P4
+    } it;
 
 public:
 
@@ -43,6 +49,10 @@ public:
     int len_trim(std::string s);
     void extract_word(std::string s, std::string& s1, std::string& s2);
     image_part CheckBorderType(const int& y, const int& x);
+    
     template<typename T>
     void BubbleSort(std::vector<T>& vec);
+
+    template<class T>
+    uint16_t compare_pixels(char lv, char rv, T func);
 };

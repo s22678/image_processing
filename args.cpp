@@ -92,8 +92,6 @@ void Args::parse(int argc, char* argv[])
 			std::cout << "Nierozpoznano polecenia: " << argv[i] << std::endl;
 			exit(0);
 		}
-
-		for(const auto& it : instructions) std::cout << "it: " << it << '\n';
 	}
 }
 

@@ -2,7 +2,20 @@
 #include <iostream>
 #include <string> 
 #include <vector>
+#include <fstream>
 #include "args.h"   
+
+
+void print_help()
+{
+    std::ifstream f("./help_info");
+
+    if (f.is_open())
+	{
+		std::cout << f.rdbuf();
+	}
+	std::cout << "\n\n";
+}
 
 inline char* to_lower_case(char* str)
 {
@@ -89,7 +102,8 @@ void Args::parse(int argc, char* argv[])
 		}
 		else
 		{
-			std::cout << "Nierozpoznano polecenia: " << argv[i] << std::endl;
+			std::cout << "Nierozpoznano polecenia: " << argv[i] << '\n';
+			print_help();
 			exit(0);
 		}
 	}
@@ -98,6 +112,12 @@ void Args::parse(int argc, char* argv[])
 bool Args::validate() const
 {
 	bool status = true;
+
+	if (instructions.size() == 0)
+	{
+		print_help();
+		return false;
+	}
   
 	int i = 0;
 	while (i < instructions.size())
@@ -108,12 +128,13 @@ bool Args::validate() const
 			if (instructions.size() > 1)
 			{
 				cerr << "flaga -h nie może być łączona z innymi flagami " << endl;
-				std::cout << "Wydrukuj pomoc" << std::endl;
+				print_help();
 				return false;
 			}
 			else
 			{
-				std::cout << "Wydrukuj pomoc" << std::endl;
+				print_help();
+				return false;
 			}
 		}
 		else if (command == ARG_INT_RESOLUTION)

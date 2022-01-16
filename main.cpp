@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 #include <stdexcept>
+#include <algorithm>
 
 #include "args.h"
 #include "PgmImage.h"

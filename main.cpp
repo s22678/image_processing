@@ -110,9 +110,6 @@ void GenerateImage(std::vector<string>& instructions)
 
 int main(int argc, char* argv[])
 {
-    // wektor ma za zadanie przechowac instrukcje z danymi podane
-    // w konsoli przez uzytkownika
-    // w takiej kolejnosci w jakiej zostaly wprowadzone do konsoli
     std::vector<string> instructions;
 
     Args args(instructions);

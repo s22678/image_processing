@@ -7,6 +7,11 @@
 #include <cmath>
 #define M_PI 3.14159265358979323846
 
+/**
+ * @brief Construct a new Pbm Image:: Pbm Image object
+ * 
+ * @param const std::string& filename - sciezka do pliku obrazu do przetworzenia
+ */
 PbmImage::PbmImage(const std::string& filename)
 {
     std::ifstream input_stream(filename, std::ios::in);
@@ -26,6 +31,11 @@ PbmImage::PbmImage(const std::string& filename)
     input_stream.close(); 
 }
 
+/**
+ * @brief zapisuje przetworzony obraz
+ * 
+ * @param const std::string& filename - sciezka pliku do zapisu 
+ */
 void PbmImage::SaveImage(const std::string& filename)
 {
 
@@ -56,6 +66,11 @@ void PbmImage::SaveImage(const std::string& filename)
     output_stream.close();
 }
 
+/**
+ * @brief obraca obraz o x stopni
+ * 
+ * @param float angle - kat obrotu obrazu
+ */
 void PbmImage::RotateImage(float angle)
 {
     // tworzymy tymczasowy wektor ktory bedzie przechowywac przetworzony obraz
@@ -88,7 +103,13 @@ void PbmImage::RotateImage(float angle)
      pixels = temp;   
 }
 
-void PbmImage::ResizeImage(int new_width, int new_height)
+/**
+ * @brief zmiana rozdzielczosci obrazu
+ * 
+ * @param new_width - nowa szerokosc
+ * @param new_height - nowa wysokosc
+ */
+void PbmImage::ResizeImage(const int& new_width, const int& new_height)
 {
     // tworzymy tymczasowy wektor o rozmiarze nowego obrazu
     std::vector<uint16_t>temp(new_width * new_height);
@@ -120,12 +141,10 @@ void PbmImage::ResizeImage(int new_width, int new_height)
     pixels = temp;
 }
 
-// template<class T>
-// uint16_t PbmImage::compare_pixels(char lv, char rv, T func)
-// {
-
-// }
-
+/**
+ * @brief erozja obrazu
+ * 
+ */
 void PbmImage::ErodeImage()
 {
     std::vector<uint16_t> temp(width * height);
@@ -166,6 +185,13 @@ void PbmImage::ErodeImage()
     pixels = temp;
 }
 
+/**
+ * @brief sprawdza, czy pixel przesuwanego okna jest na brzegu, w rogu czy w srodku obrazu aby dopasowac rozmiar okna
+ * 
+ * @param y pozycja pixela w osi pionowej na obrazie
+ * @param x pozycja pixela w osi poziomej na obrazie
+ * @return PbmImage::image_part 
+ */
 PbmImage::image_part PbmImage::CheckBorderType(const int& y, const int& x)
 {
     // lewy gorny
@@ -195,6 +221,10 @@ PbmImage::image_part PbmImage::CheckBorderType(const int& y, const int& x)
     return CENTER;
 }
 
+/**
+ * @brief dylatacja obrazu
+ * 
+ */
 void PbmImage::DilateImage()
 {
     std::vector<uint16_t> temp(width * height);
@@ -206,28 +236,28 @@ void PbmImage::DilateImage()
             if (CheckBorderType(y, x) == LEFT_TOP)
                 temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y + 1) * width + x]) || (pixels[y * width + x + 1] & 1));
 
-            if (CheckBorderType(y, x) == RIGHT_TOP)
+            else if (CheckBorderType(y, x) == RIGHT_TOP)
                 temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y + 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1));
 
-            if (CheckBorderType(y, x) == LEFT_BOTTOM)
+            else if (CheckBorderType(y, x) == LEFT_BOTTOM)
                 temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x + 1] & 1));
 
-            if (CheckBorderType(y, x) == RIGHT_BOTTOM)
+            else if (CheckBorderType(y, x) == RIGHT_BOTTOM)
                 temp[y * width + x] = ((pixels[y * width + x] & 1) || (pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1));
 
-            if (CheckBorderType(y, x) == LEFT_EDGE)
+            else if (CheckBorderType(y, x) == LEFT_EDGE)
                 temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x]) || (pixels[y * width + x + 1] & 1) || (pixels[(y + 1) * width + x] & 1));
 
-            if (CheckBorderType(y, x) == TOP_EDGE)
+            else if (CheckBorderType(y, x) == TOP_EDGE)
                 temp[y * width + x] = ((pixels[y * width + x - 1] & 1) || (pixels[y * width + x] & 1) || (pixels[y * width + x + 1] & 1) || (pixels[(y + 1) * width + x] & 1));
 
-            if (CheckBorderType(y, x) == RIGHT_EDGE)
+            else if (CheckBorderType(y, x) == RIGHT_EDGE)
                 temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x] & 1) || (pixels[(y + 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1));
 
-            if (CheckBorderType(y, x) == BOTTOM_EDGE)
+            else if (CheckBorderType(y, x) == BOTTOM_EDGE)
                 temp[y * width + x] = ((pixels[y * width + x - 1] & 1) || (pixels[y * width + x] & 1) || (pixels[y * width + x + 1] & 1) || (pixels[(y - 1) * width + x] & 1));
     
-            if (CheckBorderType(y, x) == CENTER)
+            else if (CheckBorderType(y, x) == CENTER)
                 temp[y * width + x] = ((pixels[(y - 1) * width + x] & 1) || (pixels[y * width + x - 1] & 1) || (pixels[y * width + x] & 1) || (pixels[y * width + x + 1] & 1) || (pixels[(y + 1) * width + x] & 1));
         }
     }
@@ -235,6 +265,11 @@ void PbmImage::DilateImage()
     pixels = temp;
 }
 
+/**
+ * @brief wczytuje naglowek pliku i przypisuje odpowiednie wartosci zmiennym (magic_pixel - P1, P2, P3; szerokosc, wysokosc itd)
+ * 
+ * @param std::ifstream& input - strumien z danymi naglowka obrazu do odczytania
+ */
 void PbmImage::ReadHeader(std::ifstream& input)
 {
     std::string line;
@@ -310,6 +345,13 @@ void PbmImage::ReadHeader(std::ifstream& input)
     return;
 }
 
+/**
+ * @brief przydziel slowo przed spacja do s1 i pozostale slowa do s2
+ * 
+ * @param string s - lancuch do rozbicia
+ * @param string s1 - lancuch do ktorego przydzielimy pierwsze slowo
+ * @param string s2 - lancuch do ktorego przydzielimy reszte slow z oryginalnego lancucha
+ */
 void PbmImage::extract_word(std::string s, std::string& s1, std::string& s2)
 {
     int i, mode, len;
@@ -349,11 +391,21 @@ void PbmImage::extract_word(std::string s, std::string& s1, std::string& s2)
     return;
 }
 
+/**
+ * @brief negatyw obrazu. odejmuje 1 od wartosci pixela, zamieniajac czern na biel i na odwrot.
+ * 
+ */
 void PbmImage::NegativeImage()
 {
     std::for_each(pixels.begin(), pixels.end(), [&](uint16_t& x) { x = 1 - x; return x; });
 }
 
+/**
+ * @brief pozbadz sie niepotrzebnych spacji
+ * 
+ * @param string s do rozpatrzenia
+ * @return int - dlugosc lancucha bez spacji na koncu
+ */
 int PbmImage::len_trim(std::string s)
 {
     int n;
@@ -370,6 +422,11 @@ int PbmImage::len_trim(std::string s)
     return n;
 }
 
+/**
+ * @brief wczytaj pixele do pamieci
+ * 
+ * @param input - input stream z danymi obrazu
+ */
 void PbmImage::ReadPixels(std::ifstream& input)
 {
     int idx = 0;

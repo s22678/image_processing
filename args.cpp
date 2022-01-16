@@ -5,7 +5,10 @@
 #include <fstream>
 #include "args.h"   
 
-
+/**
+ * @brief drukuje pomoc z pliku help_info z tego samego katalogu
+ * 
+ */
 void print_help()
 {
     std::ifstream f("./help_info");
@@ -17,6 +20,12 @@ void print_help()
 	std::cout << "\n\n";
 }
 
+/**
+ * @brief zamien wszystkie znaki lancucha na lowercase
+ * 
+ * @param char* str 
+ * @return char* 
+ */
 inline char* to_lower_case(char* str)
 {
 	for (auto ptr = str; *ptr != '\0'; ptr++)
@@ -26,6 +35,12 @@ inline char* to_lower_case(char* str)
 	return str;
 }
 
+/**
+ * @brief rozbij ciąg przekazanych flag do programu na flagi. porownuje kolejne elementy argv[] z lancuchami zdefiniowanymi w naglowku, a potem dodaje odpowiednie polecenia do kolejki
+ * 
+ * @param int argc - liczba argumentow (przekazana z main)
+ * @param char*argv[] - argumenty (przekazane z main)
+ */
 void Args::parse(int argc, char* argv[])
 {
 	for (int i = 1; i < argc ; i++)
@@ -109,6 +124,11 @@ void Args::parse(int argc, char* argv[])
 	}
 }
 
+/**
+ * @brief przechodzi po kolei przez vector instrukcji i wykrywa bledy ktore mogly byc podane w parametrach (np brak pliku, brak podanej rozdzielczosci flagi -rs, niepoprawne wartosci itp ).
+ * 
+ * @return bool 
+ */
 bool Args::validate() const
 {
 	bool status = true;
@@ -139,12 +159,27 @@ bool Args::validate() const
 		}
 		else if (command == ARG_INT_RESOLUTION)
 		{
-			int x = stoi(instructions[i++]);
-			int y = stoi(instructions[i++]);
-
-			if (y == 0 || x == 0)
+			try
 			{
-				cerr << "Bledna wartosc argumentu " << ARG_INT_RESOLUTION << endl;
+				int x = stoi(instructions[i++]);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << ": podany zly parametr zmiany rozdzielczosci, podaj liczbe calkowita";
+			}
+			
+			try
+			{
+				int y = stoi(instructions[i++]);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << ": podany zly parametr zmiany rozdzielczosci, podaj liczbe calkowita";
+			}
+
+			if (y == 0 || y > 5000 || x == 0 || x > 5000)
+			{
+				cerr << "Bledna wartosc argumentu. wartosc powinna byc pomiedzy 1 a 5000 " << ARG_INT_RESOLUTION << endl;
 				status = false;
 			}
 		}
@@ -159,7 +194,7 @@ bool Args::validate() const
 			}
 			else if (input.empty() || !std::filesystem::exists(input))
 			{
-				std::cout << "Bledna wartosc argumentu " << ARG_STR_INPUT << endl;
+				std::cout << "Bledna wartosc argumentu! plik pusty albo nie istnieje (albo nie ma do niego dostepu) " << ARG_STR_INPUT << endl;
 				status = false;
 			}
 		}
@@ -169,7 +204,7 @@ bool Args::validate() const
 
 			if (output.extension() != ".pgm" && output.extension() != ".pbm") // Heed the dot.
 			{
-				std::cout << output.filename() << " is an invalid output type." << endl; // Output: e.g. "myFile.cfg is an invalid type"
+				std::cout << output.filename() << " zly plik, podaj scieze pliku flagi -o z rozszerzeniem pbm albo pgm" << endl; // Output: e.g. "myFile.cfg is an invalid type"
 				status = false;
 			}
 		}

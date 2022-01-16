@@ -7,6 +7,11 @@
 #include <cmath>
 #define M_PI 3.14159265358979323846
 
+/**
+ * @brief Construct a new Pgm Image:: Pgm Image object
+ * 
+ * @param filename std::string& filename - sciezka do pliku obrazu do przetworzenia
+ */
 PgmImage::PgmImage(const std::string& filename)
 {
     std::ifstream input_stream(filename);
@@ -27,6 +32,11 @@ PgmImage::PgmImage(const std::string& filename)
     input_stream.close(); 
 }
 
+/**
+ * @brief zapisuje przetworzony obraz
+ * 
+ * @param const std::string& filename - sciezka pliku do zapisu 
+ */
 void PgmImage::SaveImage(const std::string& filename)
 {
     std::ofstream input_stream(filename.c_str(), std::ios::out | std::ios::binary);
@@ -56,6 +66,11 @@ void PgmImage::SaveImage(const std::string& filename)
     input_stream.close();
 }
 
+/**
+ * @brief obraca obraz o x stopni
+ * 
+ * @param float angle - kat obrotu obrazu
+ */
 void PgmImage::RotateImage(float angle)
 {
     // tworzymy tymczasowy wektor ktory bedzie przechowywac przetworzony obraz
@@ -88,6 +103,12 @@ void PgmImage::RotateImage(float angle)
      pixels = temp;   
 }
 
+/**
+ * @brief zmiana rozdzielczosci obrazu
+ * 
+ * @param new_width - nowa szerokosc
+ * @param new_height - nowa wysokosc
+ */
 void PgmImage::ResizeImage(int new_width, int new_height)
 {
     // tworzymy tymczasowy wektor o rozmiarze nowego obrazu
@@ -120,7 +141,11 @@ void PgmImage::ResizeImage(int new_width, int new_height)
     pixels = temp;
 }
 
-
+/**
+ * @brief zamien obraz z grayscale na binarny. przydziel pixelom mniejszym od tresholdu wartosc 0, wiekszym - max
+ * 
+ * @param treshold wartosc rodzielajaca pixele na 0 i na max
+ */
 void PgmImage::BinaryImage(const short& treshold)
 {
     if (treshold > grey_scale && treshold < 0)
@@ -134,23 +159,10 @@ void PgmImage::BinaryImage(const short& treshold)
     }
 }
 
-// sortowanie babelkowe dla filtru medianowego
-template<typename T>
-void PgmImage::BubbleSort(std::vector<T>& v)
-{
-    for (size_t i = 0; i < v.size() - 1; ++i)
-    {
-        for (size_t j = 0; j < v.size() - i - 1; ++j)
-        {
-            if (v.at(j) > v.at(j + 1))
-            {
-                std::swap(v.at(j), v.at(j + 1));
-            }
-        }
-    }
-}
-
-// filtr medianowy
+/**
+ * @brief filtr medianowy do usuwania zaklocen 'sol i pieprz' z obrazu
+ * 
+ */
 void PgmImage::ReduceNoise()
 {
     // tworzymy tymczasowy wektor na przetworzone piksele
@@ -182,7 +194,7 @@ void PgmImage::ReduceNoise()
             }
 
             // sortujemy piksele rosnaco
-            BubbleSort(median_filter);
+            std::sort(median_filter.begin(), median_filter.end(), [](const short& x, const short& y) { return x < y; });
 
             // wybieramy srodkowy piksel i umieszczamy go w nowej tablicy z pikselami
             temp[j++] = median_filter[4];
@@ -197,6 +209,11 @@ void PgmImage::ReduceNoise()
     pixels = temp;
 }
 
+/**
+ * @brief zaaplikuj rozmycie usredniajacy albo gaussa
+ * 
+ * @param string method - metoda 'gauss' albo 'average'
+ */
 void PgmImage::ApplyBlur(const std::string& method)
 { 
     // tworzymy tymczasowy wektor na przetworzone piksele
@@ -253,6 +270,11 @@ void PgmImage::ApplyBlur(const std::string& method)
     pixels = temp;
 }
 
+/**
+ * @brief wczytuje naglowek pliku i przypisuje odpowiednie wartosci zmiennym (magic_pixel - P1, P2, P3; szerokosc, wysokosc itd)
+ * 
+ * @param std::ifstream& input - strumien z danymi naglowka obrazu do odczytania
+ */
 void PgmImage::ReadHeader(std::ifstream& input)
 {
     std::string line;
@@ -338,7 +360,13 @@ void PgmImage::ReadHeader(std::ifstream& input)
     return;
 }
 
-
+/**
+ * @brief przydziel slowo przed spacja do s1 i pozostale slowa do s2
+ * 
+ * @param string s - lancuch do rozbicia
+ * @param string s1 - lancuch do ktorego przydzielimy pierwsze slowo
+ * @param string s2 - lancuch do ktorego przydzielimy reszte slow z oryginalnego lancucha
+ */
 void PgmImage::extract_word(std::string s, std::string& s1, std::string& s2)
 {
     int i, mode, len;
@@ -377,6 +405,12 @@ void PgmImage::extract_word(std::string s, std::string& s1, std::string& s2)
 
     return;
 }
+
+/**
+ * @brief zaaplikuj filtr gradientu
+ * 
+ * @param string method - metoda do wyboru. 1 dla Sobela, 2 dla Prewitta, 3 dla Robertsa
+ */
 void PgmImage::GradientImage(const std::string& method)
 {
 
@@ -454,6 +488,10 @@ void PgmImage::GradientImage(const std::string& method)
     pixels = temp;
 }
 
+/**
+ * @brief negatyw obrazu. odejmuje 1 od wartosci pixela, zamieniajac czern na biel i na odwrot.
+ * 
+ */
 void PgmImage::NegativeImage()
 {
     std::for_each(pixels.begin(), pixels.end(), [&](short& x) { x = grey_scale - x; return x; });
@@ -475,6 +513,11 @@ int PgmImage::len_trim(std::string s)
     return n;
 }
 
+/**
+ * @brief wczytaj pixele do pamieci
+ * 
+ * @param input - input stream z danymi obrazu
+ */
 void PgmImage::ReadPixels(std::ifstream& input)
 {
     int idx = 0;

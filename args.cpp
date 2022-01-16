@@ -159,9 +159,11 @@ bool Args::validate() const
 		}
 		else if (command == ARG_INT_RESOLUTION)
 		{
+			int x = 0;
+			int y = 0;
 			try
 			{
-				int x = stoi(instructions[i++]);
+				x = stoi(instructions[i++]);
 			}
 			catch(const std::exception& e)
 			{
@@ -170,7 +172,7 @@ bool Args::validate() const
 			
 			try
 			{
-				int y = stoi(instructions[i++]);
+				y = stoi(instructions[i++]);
 			}
 			catch(const std::exception& e)
 			{

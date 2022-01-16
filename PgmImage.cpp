@@ -109,7 +109,7 @@ void PgmImage::RotateImage(float angle)
  * @param new_width - nowa szerokosc
  * @param new_height - nowa wysokosc
  */
-void PgmImage::ResizeImage(int new_width, int new_height)
+void PgmImage::ResizeImage(const int& new_width, const int& new_height)
 {
     // tworzymy tymczasowy wektor o rozmiarze nowego obrazu
     std::vector<short>temp(new_width * new_height);

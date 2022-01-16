@@ -8,7 +8,7 @@
 class Image
 {
 public:
-    virtual void ResizeImage(int new_width, int new_height) = 0;
+    virtual void ResizeImage(const int& new_width, const int& new_height) = 0;
     virtual void RotateImage(float ang) = 0;
     virtual void NegativeImage() = 0;
     virtual void SaveImage(const std::string& filename) = 0;

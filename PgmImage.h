@@ -19,7 +19,7 @@ public:
     PgmImage(const std::string& filename);
     void ReadHeader(std::ifstream& input);
     void ReadPixels(std::ifstream& input);
-    void ResizeImage(int new_width, int new_height);
+    void ResizeImage(const int& new_width, const int& new_height);
     void RotateImage(float ang);
     void BinaryImage(const short& treshold);
     void ApplyBlur(const std::string& method);
